@@ -81,7 +81,18 @@ Liệt kê đúng 10 case trong `starter_v0/data/eval_group.json` (5 single turn
 
 | Case ID | What It Tests | Expected Tool/Behavior | Result |
 |---|---|---|---|
-|  |  |  |  |
+| G01_wiki_english_article | Route kiến thức nền Wikipedia và truyền query/lang/limit | `wiki(query="Quantum computing", lang="en", limit=2)` | PASS |
+| G02_recent_news_uses_lookup | Phân biệt tin hôm nay với kiến thức bách khoa | `lookup(query="OpenAI", topic="news", timeframe="day")` | PASS |
+| G03_internal_citation_policy | Chọn policy nội bộ về trích dẫn nguồn | `policy(policy_area="source_citation")` | FAIL: gọi policy nhưng thiếu `policy_area` |
+| G04_arxiv_sort_by_submission | Tìm paper và diễn giải bài mới nộp | `papers(query="retrieval-augmented generation", sort_by="submittedDate")` | FAIL: chọn `lastUpdatedDate` |
+| G05_non_research_no_tool | Không gọi tool cho yêu cầu sáng tác không cần nghiên cứu | Trả lời không gọi tool | PASS |
+| G06_multiturn_wiki_language_and_limit | Giữ tên bài và áp dụng lang/limit từ lượt sau | `wiki(query="Quantum computing", lang="en", limit=2)` | PASS |
+| G07_multiturn_policy_area_and_limit | Giữ truy vấn policy và áp dụng khu vực/số lượng | `policy(policy_area="data_privacy", top_k=2)` | PASS |
+| G08_multiturn_papers_sort | Giữ chủ đề paper và cập nhật cách sắp xếp | `papers(query="graph neural networks", sort_by="submittedDate")` | PASS |
+| G09_multiturn_social_search_refinement | Giữ từ khóa và áp dụng Top/limit | `social_search(query="AI agents", search_type="Top", limit=3)` | PASS |
+| G10_multiturn_lookup_timeframe | Giữ chủ đề và khoảng thời gian của tin tức | `lookup(query="EU AI Act", topic="news", timeframe="week")` | PASS |
+
+Run: [v3_B_group_openrouter_20261110T200053459021.json](../../starter_v0/runs/v3_B_group_openrouter_20261110T200053459021.json) — 10 case measured, 0 provider errors, case accuracy 0.80.
 
 ### B4. Live Chat Evidence
 
