@@ -123,3 +123,19 @@ tools:
         max_pages: {type: integer, default: 5, description: "Số trang"}
         max_chars: {type: integer, default: 8000, description: "Số ký tự"}
       required: [arxiv_url]
+
+  # ---------------- New tools (team) ----------------
+  - name: wiki
+    description: >-
+      Tra cứu Wikipedia (tiếng Việt hoặc tiếng Anh) và trả về đoạn tóm tắt mở đầu của các bài
+      khớp nhất, kèm link. DÙNG khi user hỏi kiến thức nền: định nghĩa, khái niệm, lịch sử, tiểu sử
+      người/tổ chức, hoặc nói rõ "theo Wikipedia". KHÔNG dùng cho tin tức mới, sự kiện gần đây hay
+      thông tin thay đổi theo ngày (dùng lookup); KHÔNG dùng để đọc một URL cụ thể (dùng fetch);
+      KHÔNG dùng để tìm paper khoa học (dùng papers).
+    parameters:
+      type: object
+      properties:
+        query: {type: string, default: "", description: "Tên khái niệm hoặc tên bài viết cần tra, ngắn gọn, không kèm câu hỏi. Tiếng Việt phải có dấu đầy đủ, ví dụ 'Trí tuệ nhân tạo' (không viết 'tri tue nhan tao')."}
+        lang: {type: string, enum: [vi, en], default: "vi", description: "Ngôn ngữ Wikipedia: 'vi' mặc định; dùng 'en' khi user yêu cầu tiếng Anh hoặc khái niệm kỹ thuật ít có bài tiếng Việt."}
+        limit: {type: integer, default: 3, description: "Số bài trả về, 1-10. Mặc định 3."}
+      required: [query]
