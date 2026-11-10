@@ -1,6 +1,6 @@
 ---
 name: wiki
-track: core
+track: bonus
 kind: live_api
 provider: Wikipedia (MediaWiki Action API)
 requires_env: []

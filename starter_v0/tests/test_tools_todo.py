@@ -151,14 +151,25 @@ def test_wiki_sends_search_request_and_maps_pages_by_rank(fake_http) -> None:
     assert first["summary"] == "x" * 600 + "..."
 
 
-def test_wiki_empty_query_or_bad_lang_returns_error_without_request(fake_http) -> None:
+@pytest.mark.parametrize("bad_query", ["", "   ", None])
+def test_wiki_empty_query_returns_error_without_request(fake_http, bad_query) -> None:
     calls = fake_http(FakeResponse(WIKI_PAGES))
 
-    for bad_args in ({"query": ""}, {"query": "   "}, {"query": None}, {"query": "AI", "lang": "fr"}):
-        result = TOOL_FUNCTIONS["wiki"](**bad_args)
-        assert result["tool"] == "wiki"
-        assert result["error"] == "ValueError"
+    result = TOOL_FUNCTIONS["wiki"](query=bad_query)
 
+    assert result["tool"] == "wiki"
+    assert result["error"] == "ValueError"
+    assert "query" in result["message"]
+    assert calls == []
+
+
+def test_wiki_unsupported_lang_returns_error_without_request(fake_http) -> None:
+    calls = fake_http(FakeResponse(WIKI_PAGES))
+
+    result = TOOL_FUNCTIONS["wiki"](query="AI", lang="fr")
+
+    assert result["error"] == "ValueError"
+    assert "lang" in result["message"]
     assert calls == []
 
 
@@ -179,11 +190,19 @@ def test_wiki_http_error_returns_error_dict(fake_http) -> None:
     assert result == {"tool": "wiki", "error": "HTTPError", "message": "HTTP 429"}
 
 
-def test_wiki_api_error_payload_and_no_match_are_handled(fake_http) -> None:
+def test_wiki_api_error_payload_with_http_200_returns_error_dict(fake_http) -> None:
+    # MediaWiki reports some errors inside a 200 response, so raise_for_status() alone misses them.
     fake_http(FakeResponse({"error": {"code": "badvalue", "info": "Unrecognized value"}}))
-    assert TOOL_FUNCTIONS["wiki"](query="AI")["error"] == "RuntimeError"
 
+    result = TOOL_FUNCTIONS["wiki"](query="AI")
+
+    assert result == {"tool": "wiki", "error": "RuntimeError", "message": "Unrecognized value"}
+
+
+def test_wiki_no_match_returns_empty_items_not_error(fake_http) -> None:
     fake_http(FakeResponse({"batchcomplete": True}))  # what Wikipedia returns when nothing matches
+
     result = TOOL_FUNCTIONS["wiki"](query="asdkjqwlekjzzz", lang="en")
+
     assert result["items"] == []
     assert "error" not in result
