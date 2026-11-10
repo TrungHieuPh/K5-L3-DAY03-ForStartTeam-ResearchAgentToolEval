@@ -1,7 +1,257 @@
 {
   "dataset_id": "day03_v2_research_group",
   "dataset_role": "group",
-  "description": "Case do NHÓM tự viết thêm để cover thêm trường hợp. Mỗi case cần: id, phase='B', query HOẶC turns, failure_type (thuộc allowed_failure_types), và expect (tool_calls[...] hoặc no_tool=true). Nên kèm metadata.what_it_tests.",
-  "allowed_failure_types": ["wrong_tool", "wrong_arg_value", "wrong_boundary", "unnecessary_tool", "out_of_scope", "missing_info"],
-  "cases": []
+  "description": "Ten team-authored cases covering new-tool routing, tool boundaries, argument selection, and multi-turn context.",
+  "allowed_failure_types": [
+    "wrong_tool",
+    "wrong_arg_value",
+    "wrong_boundary",
+    "unnecessary_tool",
+    "out_of_scope",
+    "missing_info"
+  ],
+  "cases": [
+    {
+      "id": "G01_wiki_english_article",
+      "phase": "B",
+      "query": "Tra Wikipedia tiếng Anh cho bài Quantum computing, lấy tối đa 2 kết quả.",
+      "failure_type": "wrong_tool",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "wiki",
+            "args": {
+              "query": "Quantum computing",
+              "lang": "en",
+              "limit": 2
+            }
+          }
+        ]
+      },
+      "metadata": {
+        "what_it_tests": "Route câu hỏi kiến thức nền có yêu cầu Wikipedia sang tool wiki, truyền đúng tên bài, ngôn ngữ và giới hạn kết quả."
+      }
+    },
+    {
+      "id": "G02_recent_news_uses_lookup",
+      "phase": "B",
+      "query": "Tin tức mới nhất hôm nay về OpenAI có gì?",
+      "failure_type": "wrong_tool",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "lookup",
+            "args": {
+              "query": "OpenAI",
+              "topic": "news",
+              "timeframe": "day"
+            }
+          }
+        ]
+      },
+      "metadata": {
+        "what_it_tests": "Phân biệt tin tức thay đổi theo thời gian với kiến thức bách khoa; tin hôm nay dùng lookup, không dùng wiki."
+      }
+    },
+    {
+      "id": "G03_internal_citation_policy",
+      "phase": "B",
+      "query": "Theo chính sách nội bộ về trích dẫn nguồn, cần lưu ý điều gì khi đưa thông tin bên ngoài vào báo cáo?",
+      "failure_type": "wrong_tool",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "policy",
+            "args": {
+              "policy_area": "source_citation"
+            }
+          }
+        ]
+      },
+      "metadata": {
+        "what_it_tests": "Câu hỏi về quy định nội bộ phải tra policy, chọn đúng khu vực source_citation thay vì tìm web."
+      }
+    },
+    {
+      "id": "G04_arxiv_sort_by_submission",
+      "phase": "B",
+      "query": "Tìm trên arXiv các bài về retrieval-augmented generation, ưu tiên bài mới nộp gần đây.",
+      "failure_type": "wrong_arg_value",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "papers",
+            "args": {
+              "query": "retrieval-augmented generation",
+              "sort_by": "submittedDate"
+            }
+          }
+        ]
+      },
+      "metadata": {
+        "what_it_tests": "Tìm nghiên cứu khoa học phải dùng papers và diễn giải yêu cầu bài mới nộp thành sort_by=submittedDate."
+      }
+    },
+    {
+      "id": "G05_non_research_no_tool",
+      "phase": "B",
+      "query": "Viết một lời chúc sinh nhật vui nhộn cho bạn mình, không cần tra cứu.",
+      "failure_type": "unnecessary_tool",
+      "expect": {
+        "no_tool": true,
+        "behavior": "answer_without_tool"
+      },
+      "metadata": {
+        "what_it_tests": "Yêu cầu sáng tác đơn giản, không cần thông tin nghiên cứu, không nên gọi tool tra cứu."
+      }
+    },
+    {
+      "id": "G06_multiturn_wiki_language_and_limit",
+      "phase": "B",
+      "turns": [
+        {
+          "role": "user",
+          "content": "Tra Wikipedia về một bài tên Quantum computing."
+        },
+        {
+          "role": "user",
+          "content": "Dùng Wikipedia tiếng Anh và chỉ lấy tối đa 2 kết quả."
+        }
+      ],
+      "failure_type": "wrong_arg_value",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "wiki",
+            "args": {
+              "query": "Quantum computing",
+              "lang": "en",
+              "limit": 2
+            }
+          }
+        ]
+      },
+      "metadata": {
+        "what_it_tests": "Giữ tên bài từ lượt trước và áp dụng ngôn ngữ cùng số lượng được bổ sung ở lượt cuối."
+      }
+    },
+    {
+      "id": "G07_multiturn_policy_area_and_limit",
+      "phase": "B",
+      "turns": [
+        {
+          "role": "user",
+          "content": "Tra chính sách nội bộ về chia sẻ dữ liệu nghiên cứu."
+        },
+        {
+          "role": "user",
+          "content": "Chỉ xem khu vực data_privacy và tối đa 2 mục."
+        }
+      ],
+      "failure_type": "wrong_arg_value",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "policy",
+            "args": {
+              "policy_area": "data_privacy",
+              "top_k": 2
+            }
+          }
+        ]
+      },
+      "metadata": {
+        "what_it_tests": "Mang truy vấn chính sách qua nhiều lượt và áp dụng policy_area cùng top_k được nêu ở lượt cuối."
+      }
+    },
+    {
+      "id": "G08_multiturn_papers_sort",
+      "phase": "B",
+      "turns": [
+        {
+          "role": "user",
+          "content": "Tìm bài arXiv về graph neural networks."
+        },
+        {
+          "role": "user",
+          "content": "Sắp theo ngày nộp mới nhất."
+        }
+      ],
+      "failure_type": "wrong_arg_value",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "papers",
+            "args": {
+              "query": "graph neural networks",
+              "sort_by": "submittedDate"
+            }
+          }
+        ]
+      },
+      "metadata": {
+        "what_it_tests": "Giữ chủ đề tìm paper từ lượt trước và chuyển yêu cầu ngày nộp mới nhất thành sort_by=submittedDate."
+      }
+    },
+    {
+      "id": "G09_multiturn_social_search_refinement",
+      "phase": "B",
+      "turns": [
+        {
+          "role": "user",
+          "content": "Tìm bài đăng trên X về AI agents."
+        },
+        {
+          "role": "user",
+          "content": "Chỉ lấy bài phổ biến nhất, tối đa 3 bài."
+        }
+      ],
+      "failure_type": "wrong_arg_value",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "social_search",
+            "args": {
+              "query": "AI agents",
+              "search_type": "Top",
+              "limit": 3
+            }
+          }
+        ]
+      },
+      "metadata": {
+        "what_it_tests": "Giữ từ khóa tìm kiếm qua nhiều lượt và chuyển phổ biến nhất thành Top với limit=3."
+      }
+    },
+    {
+      "id": "G10_multiturn_lookup_timeframe",
+      "phase": "B",
+      "turns": [
+        {
+          "role": "user",
+          "content": "Tìm tin tức về EU AI Act trong tuần này."
+        },
+        {
+          "role": "user",
+          "content": "Giữ đúng chủ đề EU AI Act và chỉ lấy tin trong tuần."
+        }
+      ],
+      "failure_type": "wrong_arg_value",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "lookup",
+            "args": {
+              "query": "EU AI Act",
+              "topic": "news",
+              "timeframe": "week"
+            }
+          }
+        ]
+      },
+      "metadata": {
+        "what_it_tests": "Giữ chủ đề EU AI Act trong ngữ cảnh nhiều lượt và truyền đúng topic=news, timeframe=week."
+      }
+    }
+  ]
 }
