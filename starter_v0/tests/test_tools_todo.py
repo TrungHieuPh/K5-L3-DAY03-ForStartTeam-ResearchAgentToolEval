@@ -120,3 +120,70 @@ def test_my_new_tool_bad_input_from_model() -> None:
 
 def test_my_new_tool_failure_returns_error_dict() -> None:
     pytest.skip(TODO)
+
+
+# ---------------- wiki (D - 2A202603724_NgoChiVinh) ----------------
+
+WIKI_PAGES = {"batchcomplete": True, "query": {"pages": [
+    # API returns pages in arbitrary order; "index" is the search rank.
+    {"pageid": 2, "index": 2, "title": "Trí tuệ nhân tạo tạo sinh", "extract": "AI tạo sinh...",
+     "fullurl": "https://vi.wikipedia.org/wiki/Tr%C3%AD_tu%E1%BB%87_nh%C3%A2n_t%E1%BA%A1o_t%E1%BA%A1o_sinh"},
+    {"pageid": 1, "index": 1, "title": "Trí tuệ nhân tạo", "extract": "x" * 700,
+     "fullurl": "https://vi.wikipedia.org/wiki/Tr%C3%AD_tu%E1%BB%87_nh%C3%A2n_t%E1%BA%A1o"},
+]}}
+
+
+def test_wiki_sends_search_request_and_maps_pages_by_rank(fake_http) -> None:
+    calls = fake_http(FakeResponse(WIKI_PAGES))
+
+    result = TOOL_FUNCTIONS["wiki"](query="Trí tuệ nhân tạo", lang="vi", limit=2)
+
+    assert len(calls) == 1
+    assert calls[0]["method"] == "GET"
+    assert calls[0]["url"] == "https://vi.wikipedia.org/w/api.php"
+    assert calls[0]["params"]["gsrsearch"] == "Trí tuệ nhân tạo"
+    assert calls[0]["params"]["gsrlimit"] == 2
+    assert calls[0]["headers"]["User-Agent"]
+    assert [item["title"] for item in result["items"]] == ["Trí tuệ nhân tạo", "Trí tuệ nhân tạo tạo sinh"]
+    first = result["items"][0]
+    assert first["url"] == "https://vi.wikipedia.org/wiki/Tr%C3%AD_tu%E1%BB%87_nh%C3%A2n_t%E1%BA%A1o"
+    assert first["source"] == "vi.wikipedia.org"
+    assert first["summary"] == "x" * 600 + "..."
+
+
+def test_wiki_empty_query_or_bad_lang_returns_error_without_request(fake_http) -> None:
+    calls = fake_http(FakeResponse(WIKI_PAGES))
+
+    for bad_args in ({"query": ""}, {"query": "   "}, {"query": None}, {"query": "AI", "lang": "fr"}):
+        result = TOOL_FUNCTIONS["wiki"](**bad_args)
+        assert result["tool"] == "wiki"
+        assert result["error"] == "ValueError"
+
+    assert calls == []
+
+
+def test_wiki_coerces_string_and_out_of_range_limit(fake_http) -> None:
+    calls = fake_http(FakeResponse(WIKI_PAGES))
+
+    for sent, expected in (("3", 3), (0, 1), (-5, 1), (99, 10), ("abc", 3)):
+        assert TOOL_FUNCTIONS["wiki"](query="AI", limit=sent)["limit"] == expected
+
+    assert [call["params"]["gsrlimit"] for call in calls] == [3, 1, 1, 10, 3]
+
+
+def test_wiki_http_error_returns_error_dict(fake_http) -> None:
+    fake_http(FakeResponse(status_code=429))
+
+    result = TOOL_FUNCTIONS["wiki"](query="AI")
+
+    assert result == {"tool": "wiki", "error": "HTTPError", "message": "HTTP 429"}
+
+
+def test_wiki_api_error_payload_and_no_match_are_handled(fake_http) -> None:
+    fake_http(FakeResponse({"error": {"code": "badvalue", "info": "Unrecognized value"}}))
+    assert TOOL_FUNCTIONS["wiki"](query="AI")["error"] == "RuntimeError"
+
+    fake_http(FakeResponse({"batchcomplete": True}))  # what Wikipedia returns when nothing matches
+    result = TOOL_FUNCTIONS["wiki"](query="asdkjqwlekjzzz", lang="en")
+    assert result["items"] == []
+    assert "error" not in result
