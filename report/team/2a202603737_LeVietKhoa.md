@@ -4,7 +4,7 @@
 
 - Họ tên: Lê Viết Khoa
 - MSSV: 2a202603737
-- Email: levietkhoa2002@gmail.com
+- Email: 26ai.khoalv2@vinuni.edu.vn
 - GitHub: khoa-asta
 - Nhóm: forStartTeam (L3B)
 - Vai trò theo phân công: Test Owner (C); tham gia thực nghiệm tối ưu prompt và cùng Đỗ Thanh Mai xây dựng bộ eval nhóm.
