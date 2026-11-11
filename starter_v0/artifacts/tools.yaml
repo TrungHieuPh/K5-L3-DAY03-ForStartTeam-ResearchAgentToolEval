@@ -16,14 +16,22 @@
 tools:
   # ---------------- Core tools ----------------
   - name: clarify
-    description: "Gửi một câu hỏi cho người dùng."
+    description: >
+      Ask the user ONE short follow-up question when required info is missing.
+      Use `response_type='text'` for open answers (e.g. asking for a Twitter handle or a URL).
+      Use `response_type='yes_no'` for confirming an action (e.g. before calling `send`).
+      Use `response_type='choice'` only when offering a short list in `options`.
+      Do NOT call this tool when the user's request is already complete.
     parameters:
       type: object
       properties:
-        question: {type: string, default: "", description: "Câu hỏi"}
-        response_type: {type: string, enum: [text, yes_no, choice], default: "text", description: "Kiểu trả lời"}
-        options: {type: array, default: [], items: {type: string}, description: "Các lựa chọn"}
-      required: [question]
+        question: {type: string, description: "The short follow-up question to show the user."}
+        response_type:
+          type: string
+          enum: [text, yes_no, choice]
+          description: "`text` for open answers (handle, URL). `yes_no` for confirmations. `choice` with `options`."
+        options: {type: array, items: {type: string}, description: "Only used when response_type='choice'."}
+      required: [question, response_type]
 
   - name: timeline
     description: "Lấy các bài đăng gần đây."
@@ -35,7 +43,10 @@ tools:
       required: [screenname]
 
   - name: social_search
-    description: "Tìm trên mạng xã hội."
+    description: >
+      Search Twitter/X posts by keyword (not by account — for a specific account use `timeline`).
+      Use when the user asks "trên Twitter", "trên X", "mọi người nói gì về", "tweet về".
+      Do NOT use for web/news articles — use `lookup` instead.
     parameters:
       type: object
       properties:
@@ -45,7 +56,11 @@ tools:
       required: [query]
 
   - name: lookup
-    description: "Tra cứu thông tin trên internet."
+    description: >
+      Web search for news articles and general information on the open internet.
+      Use when the user asks for "tin tức", "bài viết", "trên web", "trên internet".
+      Set `topic='news'` when the user asks about current news; set `topic='general'` otherwise.
+      Do NOT use for Twitter/X posts — use `social_search` instead.
     parameters:
       type: object
       properties:
@@ -123,3 +138,19 @@ tools:
         max_pages: {type: integer, default: 5, description: "Số trang"}
         max_chars: {type: integer, default: 8000, description: "Số ký tự"}
       required: [arxiv_url]
+
+  # ---------------- New tools (team) ----------------
+  - name: wiki
+    description: >-
+      Tra cứu Wikipedia (tiếng Việt hoặc tiếng Anh) và trả về đoạn tóm tắt mở đầu của các bài
+      khớp nhất, kèm link. DÙNG khi user hỏi kiến thức nền: định nghĩa, khái niệm, lịch sử, tiểu sử
+      người/tổ chức, hoặc nói rõ "theo Wikipedia". KHÔNG dùng cho tin tức mới, sự kiện gần đây hay
+      thông tin thay đổi theo ngày (dùng lookup); KHÔNG dùng để đọc một URL cụ thể (dùng fetch);
+      KHÔNG dùng để tìm paper khoa học (dùng papers).
+    parameters:
+      type: object
+      properties:
+        query: {type: string, default: "", description: "Tên khái niệm hoặc tên bài viết cần tra, ngắn gọn, không kèm câu hỏi. Tiếng Việt phải có dấu đầy đủ, ví dụ 'Trí tuệ nhân tạo' (không viết 'tri tue nhan tao')."}
+        lang: {type: string, enum: [vi, en], default: "vi", description: "Ngôn ngữ Wikipedia: 'vi' mặc định; dùng 'en' khi user yêu cầu tiếng Anh hoặc khái niệm kỹ thuật ít có bài tiếng Việt."}
+        limit: {type: integer, default: 3, description: "Số bài trả về, 1-10. Mặc định 3."}
+      required: [query]
