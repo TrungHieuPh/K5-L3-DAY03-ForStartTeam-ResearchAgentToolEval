@@ -14,7 +14,7 @@
 |   1 | Phan Trung Hieu | 2a202603763 | trinhphan982001@gmail.com | TrungHieuPh | Prompt Owner (A) |
 |   2 | Do Thanh Mai | 2A202603862 |  | Laurent2526 | Eval Owner (B) |
 |   3 | Le Viet Khoa | 2A202603737 |  | khoa-asta | Test Owner (C) |
-|   4 | Ngo Chi Vinh | 2A202603724 |  | NgChiVinh | UI & Demo Owner (D) |
+|   4 | Ngo Chi Vinh | 2A202603724 | chivinh251020@gmail.com | NgChiVinh | UI & Demo Owner (D) |
 
 ### Tóm tắt đóng góp theo checkpoint
 
@@ -117,7 +117,7 @@ Sao chép mục dưới đây cho từng thành viên.
 - Deploy qua Cloudflare Tunnel, lấy link dùng thử
 - Chạy `chat.py` ≥ 3 lượt live, lưu `transcripts/*.transcript.json`
 - Viết **Phần A** `group_report.md` trước 16:30 (Team showdown)
-- Tool mới của cá nhân: (ví dụ `rss_feed`)
+- Tool mới của cá nhân: `wiki` (tool mới duy nhất của nhóm)
 
 ### Đóng góp cụ thể
 
