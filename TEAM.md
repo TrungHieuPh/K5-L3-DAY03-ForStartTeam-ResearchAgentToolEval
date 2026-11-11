@@ -11,10 +11,10 @@
 
 | STT | Họ tên | MSSV | Email | GitHub | Vai trò |
 | --: | ------ | ---- | ----- | ------ | ------- |
-|   1 | Phan Trung Hieu | 2a202603763 | trinhphan982001@gmail.com | TrungHieuPh | Prompt Owner (A) |
-|   2 | Do Thanh Mai | 2A202603862 |  | Laurent2526 | Eval Owner (B) |
-|   3 | Le Viet Khoa | 2A202603737 |  | khoa-asta | Test Owner (C) |
-|   4 | Ngo Chi Vinh | 2A202603724 | chivinh251020@gmail.com | NgChiVinh | UI & Demo Owner (D) |
+|   1 | Phan Trung Hieu | 2a202603763 | 26ai.hieupt3@vinuni.edu.vn | TrungHieuPh | Prompt Owner (A) |
+|   2 | Do Thanh Mai | 2A202603862 | 26ai.maidt@vinuni.edu.vn | Laurent2526 | Eval Owner (B) |
+|   3 | Le Viet Khoa | 2A202603737 | 26ai.khoalv2@vinuni.edu.vn | khoa-asta | Test Owner (C) |
+|   4 | Ngo Chi Vinh | 2A202603724 | 26ai.vinhnc2@vinuni.edu.vn | NgChiVinh | UI & Demo Owner (D) |
 
 ### Tóm tắt đóng góp theo checkpoint
 

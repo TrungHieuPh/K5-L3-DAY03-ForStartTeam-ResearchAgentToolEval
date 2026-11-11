@@ -4,7 +4,7 @@
 
 - Họ tên: Phan Trung Hieu
 - MSSV: 2a202603763
-- Email: trinhphan982001@gmail.com
+- Email: 26ai.hieupt3@vinuni.edu.vn
 - GitHub: TrungHieuPh
 - Nhóm: forStartTeam (L3B)
 - Vai trò: Prompt Owner (A)
