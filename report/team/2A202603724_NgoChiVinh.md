@@ -4,7 +4,7 @@
 
 - Họ tên: Ngo Chi Vinh
 - MSSV: 2A202603724
-- Email: chivinh251020@gmail.com
+- Email: 26ai.vinhnc2@vinuni.edu.vn
 - GitHub: NgChiVinh
 - Nhóm: forStartTeam (L3B)
 - Vai trò: UI & Demo Owner (D)
